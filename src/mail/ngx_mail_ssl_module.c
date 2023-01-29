@@ -352,7 +352,6 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf, void *parent, void *child)
         mode = "listen ... ssl";
     } else if (conf->enable) {
         mode = "ssl";
-        conf->ssl.asynch = conf->asynch;
 
     } else if (conf->starttls != NGX_MAIL_STARTTLS_OFF) {
         mode = "starttls";
@@ -360,6 +359,8 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf, void *parent, void *child)
     } else {
         return NGX_CONF_OK;
     }
+
+    conf->ssl.asynch = conf->asynch;
 
     if (conf->file == NULL) {
         conf->file = prev->file;
@@ -539,16 +540,10 @@ ngx_mail_ssl_asynch(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return rv;
     }
 
-    /* If ssl_asynch on is configured, then ssl on is configured by default
-     * This will align 'ssl_asynch on;' and 'listen port ssl' diretives
-     * */
-
-    if(scf->asynch && (scf->enable != 1)) {
-        scf->enable = scf->asynch;
+    if (!scf->asynch) {
+        scf->file = cf->conf_file->file.name.data;
+        scf->line = cf->conf_file->line;
     }
-
-    scf->file = cf->conf_file->file.name.data;
-    scf->line = cf->conf_file->line;
 
     return NGX_CONF_OK;
 }

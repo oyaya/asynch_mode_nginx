@@ -4492,13 +4492,6 @@ ngx_http_grpc_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_conf_merge_ptr_value(conf->ssl_conf_commands,
                               prev->ssl_conf_commands, NULL);
 
-    ngx_conf_merge_value(conf->upstream.ssl_asynch,
-                              prev->upstream.ssl_asynch, 0);
-
-    if(conf->upstream.ssl_asynch && !conf->ssl) {
-        conf->ssl = 1;
-    }
-
     if (conf->ssl && ngx_http_grpc_set_ssl(cf, conf) != NGX_OK) {
         return NGX_CONF_ERROR;
     }
